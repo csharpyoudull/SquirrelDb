@@ -22,6 +22,16 @@ namespace SquirrelDb
     /// </summary>
     public class KeyTree
     {
+        #region public properties
+
+        /// <summary>
+        /// Gets or sets the count.
+        /// </summary>
+        /// <value>The count.</value>
+        public long Count { get; set; }
+
+        #endregion
+
         #region private properties
 
         /// <summary>
@@ -83,6 +93,7 @@ namespace SquirrelDb
         {
             if (Root == null)
             {
+                Count++;
                 Root = new KeyNode { Value = value, Pointer = pointer };
                 return;
             }
@@ -97,10 +108,12 @@ namespace SquirrelDb
 
             if (value < freeNode.Value)
             {
+                Count++;
                 freeNode.Left = new KeyNode { Parent = freeNode, Pointer = pointer, Value = value };
                 return;
             }
 
+            Count++;
             freeNode.Right = new KeyNode { Parent = freeNode, Pointer = pointer, Value = value };
 
         }
@@ -143,6 +156,13 @@ namespace SquirrelDb
             if (node == null)
                 return;
 
+            if (node == Root)
+            {
+                Root = null;
+                return;
+            }
+
+            Count--;
             if (node.Left == null && node.Right == null)
             {
                 if (node.Parent.Left.Equals(node))

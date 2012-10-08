@@ -11,6 +11,13 @@ namespace SquirrelDb
 
         public long FileId { get; set; }
 
+        public int Size { get; set; }
+
+        public void UpdateSize(int size)
+        {
+            Size = size;
+        }
+
         public override int GetHashCode()
         {
             return (new [] {Pointer, FileId}).GetHashCode();

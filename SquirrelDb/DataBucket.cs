@@ -159,7 +159,7 @@ namespace SquirrelDb
             }
 
             var index = freeMap.Value.Write(document);
-            KeyTree.Insert(keyHash,new DataPointer{FileId = freeMap.Key,Pointer = index});
+            KeyTree.Insert(keyHash,new DataPointer{FileId = freeMap.Key,Pointer = index,Size = document.Length});
             KeyTree.Save();
         }
 
@@ -177,7 +177,10 @@ namespace SquirrelDb
             if (keyData == null)
                 throw new Exception("Document not found.");
 
+            keyData.Pointer.UpdateSize(document.Length);
             MappedFiles[keyData.Pointer.FileId].Write(keyData.Pointer.Pointer, document);
+            KeyTree.Save();
+            
         }
 
         /// <summary>
@@ -194,7 +197,7 @@ namespace SquirrelDb
             if (keyData == null)
                 throw new Exception("Document not found.");
 
-            return MappedFiles[keyData.Pointer.FileId].Read(keyData.Pointer.Pointer);
+            return MappedFiles[keyData.Pointer.FileId].Read(keyData.Pointer.Pointer,keyData.Pointer.Size);
         }
 
         /// <summary>
@@ -222,6 +225,7 @@ namespace SquirrelDb
 
             MappedFiles[keyData.Pointer.FileId].Delete(keyData.Pointer.Pointer);
             KeyTree.Delete(keyHash);
+            KeyTree.Save();
             
         }
 
