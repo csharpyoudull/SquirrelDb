@@ -136,14 +136,48 @@ namespace SquirrelDb
 
         #endregion
 
+        #region public methods
+
         /// <summary>
         /// Stores the specified key.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="document">The document.</param>
-        public void Store(string key, string document)
+        /// <exception cref="System.Exception">Document with this key already exists.</exception>
+        public void Add(string key, string document)
         {
+            //get a map with a free space
+            var keyHash = key.GetHashCode();
+            if (KeyTree.SeekNode(null,keyHash) != null)
+                throw new Exception("Document with this key already exists.");
 
+            var freeMap = MappedFiles.FirstOrDefault(mf => mf.Value.FreeBlocks.Any());
+            while (freeMap.Value == null)
+            {
+                CreateNewMapFile();
+                freeMap = MappedFiles.FirstOrDefault(mf => mf.Value.FreeBlocks.Any());
+            }
+
+            var index = freeMap.Value.Write(document);
+            KeyTree.Insert(keyHash,new DataPointer{FileId = freeMap.Key,Pointer = index});
+            KeyTree.Save();
+        }
+
+        /// <summary>
+        /// Updates the specified key.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="document">The document.</param>
+        /// <exception cref="System.Exception">Document not found.</exception>
+        public void Update(string key, string document)
+        {
+            var keyHash = key.GetHashCode();
+            var keyData = KeyTree.SeekNode(null, keyHash);
+
+            if (keyData == null)
+                throw new Exception("Document not found.");
+
+            MappedFiles[keyData.Pointer.FileId].Write(keyData.Pointer.Pointer, document);
         }
 
         /// <summary>
@@ -151,9 +185,16 @@ namespace SquirrelDb
         /// </summary>
         /// <param name="key">The key.</param>
         /// <returns>System.String.</returns>
+        /// <exception cref="System.Exception">Document not found.</exception>
         public string Get(string key)
         {
-            return string.Empty;
+            var keyHash = key.GetHashCode();
+            var keyData = KeyTree.SeekNode(null, keyHash);
+
+            if (keyData == null)
+                throw new Exception("Document not found.");
+
+            return MappedFiles[keyData.Pointer.FileId].Read(keyData.Pointer.Pointer);
         }
 
         /// <summary>
@@ -163,17 +204,28 @@ namespace SquirrelDb
         /// <returns>Dictionary{System.StringSystem.String}.</returns>
         public Dictionary<string,string> Get(List<string> keys)
         {
-            return new Dictionary<string, string>();
+            return keys.AsParallel().ToDictionary(k => k, Get);
         }
 
         /// <summary>
         /// Deletes the specified key.
         /// </summary>
         /// <param name="key">The key.</param>
+        /// <exception cref="System.Exception">Document not found.</exception>
         public void Delete(string key)
         {
+            var keyHash = key.GetHashCode();
+            var keyData = KeyTree.SeekNode(null, keyHash);
 
+            if (keyData == null)
+                throw new Exception("Document not found.");
+
+            MappedFiles[keyData.Pointer.FileId].Delete(keyData.Pointer.Pointer);
+            KeyTree.Delete(keyHash);
+            
         }
+
+        #endregion
 
         #region private methods
 
