@@ -1,0 +1,6 @@
+<Modules>
+  <Module PersistentId="F890BB08-47D2-43F4-849F-ECFBBB765BC5" ModuleId="SquirrelDb" />
+  <Module PersistentId="B05D04BA-5ADB-4A42-AF08-B5A94EBEC9A0" ModuleId="SquirrelDb.Utility" />
+  <Module PersistentId="3E912B47-C78A-41F4-AA49-9AA3A2DF18FD" ModuleId="SquirrelDb.Test" />
+  <Module PersistentId="80398E61-C07D-4B87-9A6C-78857E773746" ModuleId="SquirrelDb.Utility.Test" />
+</Modules>
