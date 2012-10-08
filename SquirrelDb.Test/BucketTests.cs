@@ -10,7 +10,7 @@ namespace SquirrelDb.Test
         [TestMethod]
         public void CreateBucket()
         {
-            var bucket = DataBucket.CreateNewBucket("TestBucket", "../../../Db/", 1024, 250000);
+            var bucket = DataBucket.CreateNewBucket("TestBucket", "../../../Db/", 300, 250000);
             Assert.IsTrue(Directory.Exists(Path.Combine("../../../Db/", "TestBucket")));
         }
 
@@ -72,6 +72,6 @@ namespace SquirrelDb.Test
 
         }
 
-
+        
     }
 }
