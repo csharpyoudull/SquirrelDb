@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SquirrelDb.Client.Requests;
 
 namespace SquirrelDb.Client.Console
 {
@@ -38,27 +39,60 @@ namespace SquirrelDb.Client.Console
 
                 if (option.StartsWith("get", StringComparison.OrdinalIgnoreCase))
                     Get(option);
+                
+                if (option.StartsWith("del", StringComparison.OrdinalIgnoreCase))
+                    Del(option);
 
                 if (option.StartsWith("cbucket", StringComparison.OrdinalIgnoreCase))
                     CreateBucket(option);
 
-                if (option.StartsWith("load", StringComparison.OrdinalIgnoreCase))
+                if (option.StartsWith("file add", StringComparison.OrdinalIgnoreCase))
                     LoadFile(option);
 
+                if (option.StartsWith("file get", StringComparison.OrdinalIgnoreCase))
+                    GetFile(option);
+
+                if (option.StartsWith("bulk add", StringComparison.OrdinalIgnoreCase))
+                    BulkAdd(option);
+
+                
             }
         }
 
         static void LoadFile(string commandLine)
         {
-            commandLine = commandLine.Remove(0, 5);
+            commandLine = commandLine.Remove(0, 9);
 
             var client = new Client();
             var input = File.ReadAllLines(commandLine).Select(ln => ln.Split('|'));
+            var request = input.Select(i => new WriteDocRequest {BucketName = i[0], Key = i[1], Value = i[2]}).ToList();
             var watch = Stopwatch.StartNew();
-            Parallel.ForEach(input, item => client.AddDocument(item[0], item[1], item[2]));
+            client.StoreDocument(request);
             watch.Stop();
 
             System.Console.WriteLine("{0} records inserted.",input.Count());
+            System.Console.WriteLine("Operation took {0} milliseconds", watch.ElapsedMilliseconds);
+        }
+
+        static void BulkAdd(string commandLine)
+        {
+            commandLine = commandLine.Remove(0, 9);
+            var client = new Client();
+            
+            var kv = commandLine.Split('|');
+            var bucket = kv[0];
+            var keyHead = kv[1];
+            var to = int.Parse(kv[2]);
+            var request = new List<WriteDocRequest>(to);
+            Parallel.For(0, to, i =>
+                                    {
+                                        request.Add(new WriteDocRequest{BucketName = bucket,Key = keyHead + i, Value = i.ToString()});
+                                    });
+
+            var watch = Stopwatch.StartNew();
+            client.StoreDocument(request);
+            watch.Stop();
+            System.Console.WriteLine("{0} records inserted.", to);
             System.Console.WriteLine("Operation took {0} milliseconds", watch.ElapsedMilliseconds);
         }
 
@@ -80,11 +114,31 @@ namespace SquirrelDb.Client.Console
             var kv = commandLine.Split('|');
             var client = new Client();
             var watch = Stopwatch.StartNew();
-            var result = client.AddDocument(kv[0], kv[1], kv[2]);
+            var result = client.StoreDocument(new List<WriteDocRequest>{new WriteDocRequest{BucketName =kv[0],Key = kv[1], Value =kv[2]}});
             watch.Stop();
 
-            System.Console.WriteLine("Write {0} operation took {1} milliseconds",result ? "successful" : "failed",watch.ElapsedMilliseconds);
+            System.Console.WriteLine("Write {0} operation took {1} milliseconds",result[kv[1]].Equals("ok") ? "successful" : "failed",watch.ElapsedMilliseconds);
         }
+
+        static void Add(string bucket, string key, string value)
+        {
+            var client = new Client();
+            var result = client.StoreDocument(new List<WriteDocRequest> { new WriteDocRequest { BucketName = bucket, Key = key, Value = value } });
+        }
+
+
+        static void Del(string commandLine)
+        {
+            commandLine = commandLine.Remove(0, 4);
+            var kv = commandLine.Split('|');
+            var client = new Client();
+            var watch = Stopwatch.StartNew();
+            var result = client.DeleteDocument(new List<DeleteRequest> { new DeleteRequest { BucketName = kv[0], Key = kv[1] } });
+            watch.Stop();
+
+            System.Console.WriteLine("Write {0} operation took {1} milliseconds", result.Equals("ok") ? "successful" : "failed", watch.ElapsedMilliseconds);
+        }
+
 
         static void Get(string commandLine)
         {
@@ -98,15 +152,38 @@ namespace SquirrelDb.Client.Console
             System.Console.WriteLine("Operation took {0} milliseconds", watch.ElapsedMilliseconds);
         }
 
+        static void GetFile(string commandLine)
+        {
+            commandLine = commandLine.Remove(0, 9);
+            var kv = File.ReadAllLines(commandLine).Select(ln => ln.Split('|')).ToList();
+            var lines = kv.Select(k => k[1]);
+            var client = new Client();
+            var watch = Stopwatch.StartNew();
+            var request = new GetMultipleRequest { BucketName = kv[0][0], Keys = lines.ToList() };
+            var result = client.GetDocuemnts(request);
+            watch.Stop();
+            
+            foreach (var item in result)
+                System.Console.WriteLine(item.Key + ":   " + item.Value);
+
+            System.Console.WriteLine("{0} results returned.",result.Count);
+            System.Console.WriteLine("{0} documents found, {1} documents not found", result.Count(data => !string.IsNullOrEmpty(data.Value)), result.Count(data => string.IsNullOrEmpty(data.Value)));
+            System.Console.WriteLine("Operation took {0} milliseconds", watch.ElapsedMilliseconds);
+        }
+
+
         static void DisplayMenu()
         {
             System.Console.WriteLine("Options");
             System.Console.WriteLine("--------------------------");
             System.Console.WriteLine("Add: add bucket|key|value");
+            System.Console.WriteLine("Bulk Add: bulk add bucket|key start|count");
             System.Console.WriteLine("Get: get bucket|key");
+            System.Console.WriteLine("Del: del bucket|key");
             System.Console.WriteLine("CBucket: bucketName|maxRecordSize|maxRecordsPerBin");           
             System.Console.WriteLine("--------------------------");
-            System.Console.WriteLine("Load: file");
+            System.Console.WriteLine("file add: file");
+            System.Console.WriteLine("file get: file");
             System.Console.WriteLine("-Files must be in pipe delimited bucket|key|value format.");
             System.Console.WriteLine("--------------------------");
             System.Console.WriteLine("Menu: to display menu.");

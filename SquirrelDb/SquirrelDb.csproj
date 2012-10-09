@@ -52,6 +52,7 @@
     <Compile Include="DataBucket.cs" />
     <Compile Include="DataPointer.cs" />
     <Compile Include="Requests\CreateBucketRequest.cs" />
+    <Compile Include="Requests\DeleteRequest.cs" />
     <Compile Include="Requests\GetMultipleRequest.cs" />
     <Compile Include="KeyNode.cs" />
     <Compile Include="KeyTree.cs" />

@@ -21,7 +21,7 @@ TestBucket|ME|Maine
 TestBucket|MT|Montana
 TestBucket|NE|Nebraska
 TestBucket|NV|Nevada
-TestBucket|H|New Hampshire
+TestBucket|NH|New Hampshire
 TestBucket|NJ|New Jersey
 TestBucket|NM|New Mexico
 TestBucket|NY|New York

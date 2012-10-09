@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Nancy;
 using Nancy.Hosting.Self;
 using Newtonsoft.Json;
@@ -59,7 +60,7 @@ namespace SquirrelDb
                                         var reader = new StreamReader(Request.Body);
                                         var json = reader.ReadToEnd();
 
-                                        return Store(JsonConvert.DeserializeObject<WriteDocRequest>(json));
+                                        return Store(JsonConvert.DeserializeObject<List<WriteDocRequest>>(json));
                                     };
 
             Put["/buckets/"] = parameters =>
@@ -69,9 +70,33 @@ namespace SquirrelDb
 
                                         return CreateBucket(JsonConvert.DeserializeObject<CreateBucketRequest>(json));
                                     };
+            Delete["/documents/"] = parameters =>
+                                        {
+                                            var reader = new StreamReader(Request.Body);
+                                            var json = reader.ReadToEnd();
+
+                                            return DeleteRecord(JsonConvert.DeserializeObject<List<DeleteRequest>>(json));
+                                        };
 
 
+        }
 
+        private string DeleteRecord(List<DeleteRequest> deletes)
+        {
+            try
+            {
+                foreach (var delete in deletes)
+                {
+                    if (Buckets.ContainsKey(delete.BucketName))
+                        Buckets[delete.BucketName].Delete(delete.Key);
+                }
+
+                return "ok";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
 
         /// <summary>
@@ -79,30 +104,47 @@ namespace SquirrelDb
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>System.String.</returns>
-        private string Store(WriteDocRequest request)
+        private Dictionary<string,string> Store(List<WriteDocRequest> requests)
         {
             try
             {
-                if (string.IsNullOrEmpty(request.BucketName))
-                    return string.Empty;
+                var output = new Dictionary<string, string>();
+                Parallel.ForEach(requests, request =>
+                                               {
+                                                   if (string.IsNullOrEmpty(request.BucketName))
+                                                   {
+                                                       output.Add(request.Key,"bucket name required.");
+                                                   }
 
-                if (string.IsNullOrEmpty(request.Key))
-                    return string.Empty;
+                                                   if (string.IsNullOrEmpty(request.Key))
+                                                   {
+                                                       output.Add(request.Key, "bucket name required.");
+                                                   }
 
-                if (!Buckets.ContainsKey(request.BucketName.ToLower()))
-                    return string.Empty;
+                                                   if (!Buckets.ContainsKey(request.BucketName.ToLower()))
+                                                   {
+                                                       output.Add(request.Key, "bucket name required.");
+                                                   }
+                                                   if (!request.Update)
+                                                   {
+                                                       Buckets[request.BucketName.ToLower()].Add(request.Key,
+                                                                                                 request.Value);
+                                                       output.Add(request.Key, "ok");
+                                                   }
 
-                if (!request.Update)
-                    Buckets[request.BucketName.ToLower()].Add(request.Key,request.Value);
-
-                if (request.Update)
-                    Buckets[request.BucketName.ToLower()].Update(request.Key, request.Value);
-
-                return "Ok";
+                                                   if (request.Update)
+                                                   {
+                                                       Buckets[request.BucketName.ToLower()].Update(request.Key,
+                                                                                                    request.Value);
+                                                       output.Add(request.Key, "ok");
+                                                   }
+                                               });
+                return output;
             }
             catch(Exception ex)
             {
-                return ex.Message;
+                return new Dictionary<string, string>{{"all",ex.Message}};
+                
             }
         }
 
@@ -189,6 +231,7 @@ namespace SquirrelDb
         /// </summary>
         /// <value>The service host.</value>
         private static NancyHost ServiceHost { get; set; }
+        
         /// <summary>
         /// Activates the database.
         /// </summary>

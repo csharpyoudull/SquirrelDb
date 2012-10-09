@@ -167,13 +167,38 @@ namespace SquirrelDb
             if (node == null)
                 return;
 
-            if (node == Root)
-            {
-                Root = null;
-                return;
-            }
 
             Count--;
+            if (node == Root)
+            {
+                if (node.Right != null)
+                {
+                    Root = node.Right;
+                }
+                else
+                {
+                    Root = node.Left;
+                    return;
+                }
+
+                if (node.Left == null)
+                    return;
+
+                if (Root.Left == null)
+                {
+                    Root.Left = node.Left;
+                    return;
+                }
+
+                var lastParent = Root;
+                while (lastParent.Left != null)
+                {
+                    lastParent = lastParent.Left;
+                }
+
+                lastParent.Left = node.Left;
+            }
+
             if (node.Left == null && node.Right == null)
             {
                 if (node.Parent.Left.Equals(node))

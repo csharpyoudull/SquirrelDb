@@ -73,6 +73,11 @@ namespace SquirrelDb
         /// </summary>
         private readonly object _saveLock = new object();
 
+        /// <summary>
+        /// The _map lock
+        /// </summary>
+        private static readonly object MapLock = new object();
+
         #endregion
 
         #region constructors
@@ -95,25 +100,29 @@ namespace SquirrelDb
         /// <returns>MappedFile.</returns>
         public static MappedFile CreateNewMap(string fileName, string location, int maxBlockSize, int maxBlocksPerFile)
         {
-            var map = new MappedFile
-                          {
-                              FileName = fileName,
-                              Location = location,
-                              MaxBlockSize = maxBlockSize,
-                              MapFile =
-                                  MemoryMappedFile.CreateFromFile(Path.Combine(location, fileName), FileMode.CreateNew,
-                                                                  fileName, maxBlockSize*maxBlocksPerFile)
-                          };
-
-            for (var i = 0; i < maxBlocksPerFile; i++)
+            lock (MapLock)
             {
-                map.FreeBlocks.Add(i);
+                var map = new MappedFile
+                              {
+                                  FileName = fileName,
+                                  Location = location,
+                                  MaxBlockSize = maxBlockSize,
+                                  MapFile =
+                                      MemoryMappedFile.CreateFromFile(Path.Combine(location, fileName),
+                                                                      FileMode.CreateNew,
+                                                                      fileName, maxBlockSize*maxBlocksPerFile)
+                              };
+
+                for (var i = 0; i < maxBlocksPerFile; i++)
+                {
+                    map.FreeBlocks.Add(i);
+                }
+
+                var configPath = Path.Combine(location, fileName + ".config");
+                File.WriteAllText(configPath, map.ToString());
+
+                return map;
             }
-
-            var configPath = Path.Combine(location, fileName + ".config");
-            File.WriteAllText(configPath,map.ToString());
-
-            return map;
         }
 
         /// <summary>

@@ -34,13 +34,11 @@ namespace SquirrelDb.Client
             return message.Equals("ok", StringComparison.OrdinalIgnoreCase);
         }
 
-        public bool AddDocument(string bucket, string key, string document)
+        public Dictionary<string,string> StoreDocument(List<WriteDocRequest> documents)
         {
             var hostUrl = ConfigurationManager.AppSettings["ApiHostUrl"];
 
-            var createBucket = new WriteDocRequest { BucketName = bucket, Key = key,Value = document,Update = false};
-
-            var requstJson = JsonConvert.SerializeObject(createBucket);
+            var requstJson = JsonConvert.SerializeObject(documents);
             var request = HttpWebRequest.Create(hostUrl + "/documents/") as HttpWebRequest;
             request.Method = "PUT";
             request.ContentLength = requstJson.Length;
@@ -49,27 +47,24 @@ namespace SquirrelDb.Client
             var reader = new StreamReader(response.GetResponseStream());
             var message = reader.ReadToEnd();
 
-            return message.Equals("ok", StringComparison.OrdinalIgnoreCase);
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(message);
         }
 
-        public bool UpdateDocument(string bucket, string key, string document)
+        public string DeleteDocument(List<DeleteRequest> documents)
         {
             var hostUrl = ConfigurationManager.AppSettings["ApiHostUrl"];
 
-            var createBucket = new WriteDocRequest { BucketName = bucket, Key = key, Value = document, Update = false };
-
-            var requstJson = JsonConvert.SerializeObject(createBucket);
+            var requstJson = JsonConvert.SerializeObject(documents);
             var request = HttpWebRequest.Create(hostUrl + "/documents/") as HttpWebRequest;
-            request.Method = "PUT";
+            request.Method = "DELETE";
             request.ContentLength = requstJson.Length;
             request.GetRequestStream().Write(Encoding.ASCII.GetBytes(requstJson), 0, requstJson.Length);
             var response = request.GetResponse();
             var reader = new StreamReader(response.GetResponseStream());
             var message = reader.ReadToEnd();
 
-            return message.Equals("ok", StringComparison.OrdinalIgnoreCase);
+            return message;
         }
-
 
         public string GetDocument(string bucket, string key)
         {
@@ -83,9 +78,20 @@ namespace SquirrelDb.Client
             return message;
         }
 
-        public Dictionary<string,string> GetDocuemnts(List<string> keys)
+        public Dictionary<string,string> GetDocuemnts(GetMultipleRequest getRequest)
         {
-            return new Dictionary<string, string>();
+            var hostUrl = ConfigurationManager.AppSettings["ApiHostUrl"];
+
+            var requstJson = JsonConvert.SerializeObject(getRequest);
+            var request = HttpWebRequest.Create(hostUrl + "/documents/") as HttpWebRequest;
+            request.Method = "POST";
+            request.ContentLength = requstJson.Length;
+            request.GetRequestStream().Write(Encoding.ASCII.GetBytes(requstJson), 0, requstJson.Length);
+            var response = request.GetResponse();
+            var reader = new StreamReader(response.GetResponseStream());
+            var message = reader.ReadToEnd();
+
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(message);
         }
     }
 }

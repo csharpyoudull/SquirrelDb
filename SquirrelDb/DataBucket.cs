@@ -74,6 +74,11 @@ namespace SquirrelDb
         [JsonIgnore]
         private KeyTree KeyTree { get; set; }
 
+        /// <summary>
+        /// The _map lock
+        /// </summary>
+        private readonly object _mapLock  = new object();
+
         #endregion
 
         #region constructors
@@ -195,7 +200,7 @@ namespace SquirrelDb
             var keyData = KeyTree.SeekNode(null, keyHash);
 
             if (keyData == null)
-                throw new Exception("Document not found.");
+                return string.Empty;
 
             return MappedFiles[keyData.Pointer.FileId].Read(keyData.Pointer.Pointer,keyData.Pointer.Size);
         }
@@ -238,9 +243,14 @@ namespace SquirrelDb
         /// </summary>
         private void CreateNewMapFile()
         {
-            var count = (MappedFiles.Count() + 1);
-            var hash = (Name + "-" + count).GetHashCode();
-            MappedFiles.Add(hash,MappedFile.CreateNewMap(hash + ".bin",Location,MaxDocumentSize,MaxDocumentCountPerFile));
+            lock (_mapLock)
+            {
+                var count = (MappedFiles.Count() + 1);
+                var hash = (Name + "-" + count).GetHashCode();
+                MappedFiles.Add(hash,
+                                MappedFile.CreateNewMap(hash + ".bin", Location, MaxDocumentSize,
+                                                        MaxDocumentCountPerFile));
+            }
         }
 
         /// <summary>
