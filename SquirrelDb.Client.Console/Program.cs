@@ -27,6 +27,12 @@ namespace SquirrelDb.Client.Console
                     continue;
                 }
 
+                if (option.Equals("menu", StringComparison.OrdinalIgnoreCase))
+                {
+                    System.Console.Clear();
+                    DisplayMenu();
+                }
+
                 if (option.StartsWith("add",StringComparison.OrdinalIgnoreCase))
                     Add(option);
 
@@ -37,7 +43,7 @@ namespace SquirrelDb.Client.Console
                     CreateBucket(option);
 
                 if (option.StartsWith("load", StringComparison.OrdinalIgnoreCase))
-                    CreateBucket(option);
+                    LoadFile(option);
 
             }
         }
