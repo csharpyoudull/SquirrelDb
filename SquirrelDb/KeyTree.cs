@@ -11,7 +11,10 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+
+using System;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -20,6 +23,7 @@ namespace SquirrelDb
     /// <summary>
     /// Class KeyTree
     /// </summary>
+    [Serializable]
     public class KeyTree
     {
         #region public properties
@@ -77,7 +81,14 @@ namespace SquirrelDb
         /// <returns>KeyTree.</returns>
         public static KeyTree Load(string fileName)
         {
-            return JsonConvert.DeserializeObject<KeyTree>(File.ReadAllText(fileName));
+            var formatter = new BinaryFormatter();
+            KeyTree output;
+            using (var fs = File.Open(fileName,FileMode.Open))
+            {
+                output = formatter.Deserialize(fs) as KeyTree;
+            }
+
+            return output;
         }
 
         #endregion
@@ -222,7 +233,13 @@ namespace SquirrelDb
             {
                 lock (_saveLock)
                 {
-                    File.WriteAllText(FileName, JsonConvert.SerializeObject(this));
+                    var formatter = new BinaryFormatter();
+                    using (var stream = File.Open(FileName, FileMode.OpenOrCreate))
+                    {
+                        formatter.Serialize(stream, this);
+                        stream.Close();
+                    }
+
                 }
             });
             saveTask.Start();

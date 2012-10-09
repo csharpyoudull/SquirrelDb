@@ -9,6 +9,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquirrelDb.Test", "Squirrel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquirrelDb.Utility.Test", "SquirrelDb.Utility.Test\SquirrelDb.Utility.Test.csproj", "{80398E61-C07D-4B87-9A6C-78857E773746}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquirrelDb.Client", "SquirrelDb.Client\SquirrelDb.Client.csproj", "{DC807308-2B20-4982-BC5D-A35C7E58ECBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquirrelDb.Client.Test", "SquirrelDb.Client.Test\SquirrelDb.Client.Test.csproj", "{00C7469D-6AC7-4E1E-A6DF-130F24EDE98C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquirrelDb.MocServer", "SquirrelDb.MocServer\SquirrelDb.MocServer.csproj", "{67498487-5386-44F8-9ACE-2A5790B2E999}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquirrelDb.Client.Console", "SquirrelDb.Client.Console\SquirrelDb.Client.Console.csproj", "{22C71B04-3AA8-4031-B3A1-5607426C2BDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +39,22 @@ Global
 		{80398E61-C07D-4B87-9A6C-78857E773746}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80398E61-C07D-4B87-9A6C-78857E773746}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80398E61-C07D-4B87-9A6C-78857E773746}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC807308-2B20-4982-BC5D-A35C7E58ECBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC807308-2B20-4982-BC5D-A35C7E58ECBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC807308-2B20-4982-BC5D-A35C7E58ECBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC807308-2B20-4982-BC5D-A35C7E58ECBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00C7469D-6AC7-4E1E-A6DF-130F24EDE98C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00C7469D-6AC7-4E1E-A6DF-130F24EDE98C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00C7469D-6AC7-4E1E-A6DF-130F24EDE98C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00C7469D-6AC7-4E1E-A6DF-130F24EDE98C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67498487-5386-44F8-9ACE-2A5790B2E999}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67498487-5386-44F8-9ACE-2A5790B2E999}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67498487-5386-44F8-9ACE-2A5790B2E999}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67498487-5386-44F8-9ACE-2A5790B2E999}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22C71B04-3AA8-4031-B3A1-5607426C2BDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22C71B04-3AA8-4031-B3A1-5607426C2BDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22C71B04-3AA8-4031-B3A1-5607426C2BDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22C71B04-3AA8-4031-B3A1-5607426C2BDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

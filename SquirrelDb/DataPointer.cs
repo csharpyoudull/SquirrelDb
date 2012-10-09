@@ -12,11 +12,14 @@
 // <summary></summary>
 // ***********************************************************************
 
+using System;
+
 namespace SquirrelDb
 {
     /// <summary>
     /// Struct DataPointer
     /// </summary>
+    [Serializable]
     public struct DataPointer
     {
         /// <summary>

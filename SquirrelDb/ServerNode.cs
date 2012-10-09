@@ -32,23 +32,20 @@ namespace SquirrelDb
         /// Gets or sets the buckets.
         /// </summary>
         /// <value>The buckets.</value>
-        public Dictionary<string, DataBucket> Buckets { get; set; }
+        public static Dictionary<string, DataBucket> Buckets { get; set; }
 
         /// <summary>
         /// Gets or sets the db location.
         /// </summary>
         /// <value>The db location.</value>
-        public string DbLocation { get; set; }
+        public static string DbLocation { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerNode" /> class.
         /// </summary>
         public ServerNode()
         {
-            Buckets = new Dictionary<string, DataBucket>();
-            DbLocation = ConfigurationManager.AppSettings["DatabaseLocation"];
-            
-            Get["/documents/{bucket}{id}"] = parameters => GetByKey(parameters[Buckets],parameters["id"]);
+            Get["/documents/{bucket}/{id}"] = parameters => GetByKey(parameters["bucket"],parameters["id"]);
             Get["/buckets/"] = parameters => JsonConvert.SerializeObject(Buckets.Keys);
             Post["/documents/"] = parameters =>
                                      {
@@ -197,8 +194,18 @@ namespace SquirrelDb
         /// </summary>
         public static void ActivateDatabase()
         {
+            Buckets = new Dictionary<string, DataBucket>();
+            DbLocation = ConfigurationManager.AppSettings["DatabaseLocation"];
+            var buckets = Directory.GetFiles(DbLocation, "*.bucket").Select(fi => new FileInfo(fi));
+            foreach (var bucket in buckets)
+            {
+                var bk = DataBucket.LoadDataBucket(bucket.Name.Replace(".bucket", string.Empty),DbLocation);
+                Buckets.Add(bk.Name, bk);
+            }
+
             var hostUrl = ConfigurationManager.AppSettings["ApiHostUrl"];
             ServiceHost = new NancyHost(new Uri(hostUrl));
+            ServiceHost.Start();
         }
     }
 }
