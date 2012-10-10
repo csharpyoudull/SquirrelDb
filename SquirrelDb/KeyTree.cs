@@ -190,85 +190,53 @@ namespace SquirrelDb
             if (node == null)
                 return;
 
-
             Count--;
-            if (node == Root)
-            {
-                if (node.Right != null)
-                {
-                    Root = node.Right;
-                }
-                else
-                {
-                    Root = node.Left;
-                    return;
-                }
-
-                if (node.Left == null)
-                    return;
-
-                if (Root.Left == null)
-                {
-                    Root.Left = node.Left;
-                    return;
-                }
-
-                var lastParent = Root;
-                while (lastParent.Left != null)
-                {
-                    lastParent = lastParent.Left;
-                }
-
-                lastParent.Left = node.Left;
-            }
-
-            if (node.Left == null && node.Right == null)
-            {
-                if (node.Parent.Left.Equals(node))
-                {
-                    node.Parent.Left = null;
-                    return;
-                }
-
-                if (node.Parent.Right.Equals(node))
-                {
-                    node.Parent.Right = null;
-                    return;
-                }
-            }
-
             if (node.Right != null)
             {
-                if (node.Parent.Right.Equals(node))
+                var leftNode = node.Left;
+                var parent = node.Parent;
+                var isLeft = parent != null && parent.Left.Equals(node);
+
+                node = node.Right;
+                if (parent != null)
                 {
-                    node.Parent.Right = node.Right;
-                    if (node.Left != null)
-                    {
-                        var newParent = SeekFreeNode(node.Left.Value, node.Right);
-                        if (node.Left.Value < newParent.Value)
-                        {
-                            newParent.Left = node.Left;
-                            node.Left.Parent = newParent;
-                        }
-                        else
-                        {
-                            newParent.Right = node.Left;
-                            node.Left.Parent = newParent;
-                        }
-                    }
-                }
-                else
-                {
-                    node.Parent.Right = node.Right;
+                    if (isLeft)
+                        parent.Left = node;
+
+                    if (!isLeft)
+                        parent.Right = node;
                 }
 
+                if (leftNode != null)
+                {
+                    while (node.Left != null)
+                    {
+                        node = node.Left;
+                    }
+
+                    node.Left = leftNode;
+                    leftNode.Parent = node;
+                }
+                Save();
                 return;
             }
 
-            //left
             if (node.Left != null)
             {
-                node.Parent.Right = node.Left;
+                var parent = node.Parent;
+                var isLeft = parent != null && parent.Left.Equals(node);
+                node = node.Left;
+
+                if (parent != null)
+                {
+                    if (isLeft)
+                        parent.Left = node;
+
+                    if (!isLeft)
+                        parent.Right = node;
+                }
+
+                Save();
             }
             
         }

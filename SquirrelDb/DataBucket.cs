@@ -13,6 +13,7 @@
 // ***********************************************************************
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -154,14 +155,14 @@ namespace SquirrelDb
             //get a map with a free space
             var keyHash = key.GetHashCode();
             var freeMap = MappedFiles.FirstOrDefault(mf => mf.Value.FreeBlocks.Any());
-            while (freeMap.Value == null)
+            if (freeMap.Value == null)
             {
                 CreateNewMapFile();
                 freeMap = MappedFiles.FirstOrDefault(mf => mf.Value.FreeBlocks.Any());
             }
-
+            
             var index = freeMap.Value.Write(document);
-
+            
             if (index < 0)
             {
                 Add(key,document);
@@ -169,7 +170,6 @@ namespace SquirrelDb
             }
 
             KeyTree.Insert(keyHash,new DataPointer{FileId = freeMap.Key,Pointer = index,Size = document.Length});
-            KeyTree.Save();
         }
 
         /// <summary>

@@ -4,40 +4,42 @@
     <File id="B05D04BA-5ADB-4A42-AF08-B5A94EBEC9A0/f:KeyUtility.cs" caret="321" fromTop="12" />
     <File id="3E912B47-C78A-41F4-AA49-9AA3A2DF18FD/f:MappedFileTests.cs" caret="0" fromTop="0" />
     <File id="B05D04BA-5ADB-4A42-AF08-B5A94EBEC9A0/f:StringUtilities.cs" caret="682" fromTop="24" />
-    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:MappedFile.cs" caret="6476" fromTop="5" />
     <File id="3E912B47-C78A-41F4-AA49-9AA3A2DF18FD/f:TestDocument.cs" caret="0" fromTop="0" />
-    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:DataPointer.cs" caret="642" fromTop="21" />
     <File id="3E912B47-C78A-41F4-AA49-9AA3A2DF18FD/f:BucketTests.cs" caret="2062" fromTop="28" />
     <File id="00C7469D-6AC7-4E1E-A6DF-130F24EDE98C/f:ClientTests.cs" caret="834" fromTop="16" />
     <File id="DC807308-2B20-4982-BC5D-A35C7E58ECBE/d:Requests/f:GetMultipleRequest.cs" caret="686" fromTop="19" />
     <File id="22C71B04-3AA8-4031-B3A1-5607426C2BDF/f:States.txt" caret="558" fromTop="23" />
     <File id="DC807308-2B20-4982-BC5D-A35C7E58ECBE/d:Requests/f:DeleteRequest.cs" caret="545" fromTop="5" />
     <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/d:Requests/f:DeleteRequest.cs" caret="546" fromTop="14" />
-    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:ServerNode.cs" caret="3725" fromTop="93" />
+    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:DuplicateKeyException.cs" caret="174" fromTop="8" />
+    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:DataPointer.cs" caret="1185" fromTop="23" />
+    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:MappedFile.cs" caret="7164" fromTop="16" />
     <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:KeyNode.cs" caret="0" fromTop="0" />
-    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:DataBucket.cs" caret="7393" fromTop="23" />
-    <File id="22C71B04-3AA8-4031-B3A1-5607426C2BDF/f:Program.cs" caret="1284" fromTop="8" />
-    <File id="DC807308-2B20-4982-BC5D-A35C7E58ECBE/f:Client.cs" caret="2872" fromTop="36" />
-    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:KeyTree.cs" caret="4997" fromTop="0" />
+    <File id="22C71B04-3AA8-4031-B3A1-5607426C2BDF/f:Program.cs" caret="4138" fromTop="0" />
+    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:DataBucket.cs" caret="5934" fromTop="0" />
+    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:ServerNode.cs" caret="7341" fromTop="17" />
+    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:KeyTree.cs" caret="6069" fromTop="34" />
+    <File id="DC807308-2B20-4982-BC5D-A35C7E58ECBE/f:Client.cs" caret="4391" fromTop="43" />
   </RecentFiles>
   <RecentEdits>
     <File id="B05D04BA-5ADB-4A42-AF08-B5A94EBEC9A0/f:StringUtilities.cs" caret="219" fromTop="10" />
     <File id="3E912B47-C78A-41F4-AA49-9AA3A2DF18FD/f:TestDocument.cs" caret="429" fromTop="18" />
     <File id="3E912B47-C78A-41F4-AA49-9AA3A2DF18FD/f:MappedFileTests.cs" caret="3760" fromTop="18" />
-    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:MappedFile.cs" caret="241" fromTop="5" />
     <File id="80398E61-C07D-4B87-9A6C-78857E773746/f:KeyUtilityTests.cs" caret="350" fromTop="12" />
     <File id="B05D04BA-5ADB-4A42-AF08-B5A94EBEC9A0/f:KeyUtility.cs" caret="403" fromTop="13" />
     <File id="3E912B47-C78A-41F4-AA49-9AA3A2DF18FD/f:BucketTests.cs" caret="2155" fromTop="35" />
     <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:KeyNode.cs" caret="676" fromTop="22" />
     <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:DataPointer.cs" caret="642" fromTop="21" />
     <File id="00C7469D-6AC7-4E1E-A6DF-130F24EDE98C/f:ClientTests.cs" caret="830" fromTop="16" />
-    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:DataBucket.cs" caret="7393" fromTop="20" />
     <File id="22C71B04-3AA8-4031-B3A1-5607426C2BDF/f:States.txt" caret="558" fromTop="23" />
     <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/d:Requests/f:DeleteRequest.cs" caret="515" fromTop="13" />
     <File id="DC807308-2B20-4982-BC5D-A35C7E58ECBE/d:Requests/f:DeleteRequest.cs" caret="545" fromTop="14" />
-    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:ServerNode.cs" caret="3725" fromTop="26" />
-    <File id="DC807308-2B20-4982-BC5D-A35C7E58ECBE/f:Client.cs" caret="2872" fromTop="36" />
-    <File id="22C71B04-3AA8-4031-B3A1-5607426C2BDF/f:Program.cs" caret="1284" fromTop="8" />
-    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:KeyTree.cs" caret="5306" fromTop="38" />
+    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:MappedFile.cs" caret="3228" fromTop="38" />
+    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:DuplicateKeyException.cs" caret="128" fromTop="7" />
+    <File id="22C71B04-3AA8-4031-B3A1-5607426C2BDF/f:Program.cs" caret="4236" fromTop="21" />
+    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:ServerNode.cs" caret="5981" fromTop="29" />
+    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:DataBucket.cs" caret="5734" fromTop="7" />
+    <File id="F890BB08-47D2-43F4-849F-ECFBBB765BC5/f:KeyTree.cs" caret="5894" fromTop="26" />
+    <File id="DC807308-2B20-4982-BC5D-A35C7E58ECBE/f:Client.cs" caret="3366" fromTop="29" />
   </RecentEdits>
 </RecentFiles>

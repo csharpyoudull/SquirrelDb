@@ -59,6 +59,12 @@ namespace SquirrelDb
         /// <value>The free blocks.</value>
         public List<long> FreeBlocks { get; set; }
 
+        /// <summary>
+        /// Gets or sets the blocks free.
+        /// </summary>
+        /// <value>The blocks free.</value>
+        public long BlocksFree { get; set; }
+
         #endregion
 
         #region private properties
@@ -118,6 +124,7 @@ namespace SquirrelDb
                     map.FreeBlocks.Add(i);
                 }
 
+                map.BlocksFree = maxBlocksPerFile;
                 var configPath = Path.Combine(location, fileName + ".config");
                 File.WriteAllText(configPath, map.ToString());
 
@@ -153,17 +160,17 @@ namespace SquirrelDb
         {
             lock(_writeLock)
             {
-                if (!FreeBlocks.Any())
+                if (BlocksFree <= 0)
                     return -1;
 
-                var freeBlock = FreeBlocks.Min(b => b);
-                var accessor = MapFile.CreateViewAccessor(freeBlock*MaxBlockSize, MaxBlockSize);
-
-                accessor.WriteArray(0,Encoding.ASCII.GetBytes(value),0,value.Length);
-                accessor.Flush();
-                accessor.Dispose();
+                var freeBlock = FreeBlocks.First();
+                using (var accessor = MapFile.CreateViewAccessor(freeBlock * MaxBlockSize, MaxBlockSize))
+                {
+                    accessor.WriteArray(0, Encoding.ASCII.GetBytes(value), 0, value.Length);
+                }
 
                 FreeBlocks = FreeBlocks.Where(block => !block.Equals(freeBlock)).ToList();
+                BlocksFree--;
                 Save();
                 return freeBlock;
             }
@@ -176,11 +183,10 @@ namespace SquirrelDb
         /// <param name="value">The value.</param>
         public void Write(long index, string value)
         {   
-            var accessor = MapFile.CreateViewAccessor(index * MaxBlockSize, MaxBlockSize);
-
-            accessor.WriteArray(0, Encoding.ASCII.GetBytes(value), 0, value.Length);
-            accessor.Flush();
-            accessor.Dispose();  
+            using (var accessor = MapFile.CreateViewAccessor(index * MaxBlockSize, MaxBlockSize))
+            {
+                accessor.WriteArray(0, Encoding.ASCII.GetBytes(value), 0, value.Length);
+            }
         }
 
         /// <summary>
@@ -190,9 +196,11 @@ namespace SquirrelDb
         /// <returns>System.String.</returns>
         public string Read(long position)
         {
-            var accessor = MapFile.CreateViewAccessor(position * MaxBlockSize, MaxBlockSize);
             var data = new byte[MaxBlockSize];
-            accessor.ReadArray(0, data, 0, data.Length);
+            using (var accessor = MapFile.CreateViewAccessor(position * MaxBlockSize, MaxBlockSize))
+            {
+                accessor.ReadArray(0, data, 0, data.Length);
+            }
 
             return Encoding.ASCII.GetString(data).TrimEnd();
         }
@@ -205,10 +213,11 @@ namespace SquirrelDb
         /// <returns>System.String.</returns>
         public string Read(long position, long length)
         {
-            var accessor = MapFile.CreateViewAccessor(position * MaxBlockSize, length);
             var data = new byte[length];
-            accessor.ReadArray(0, data, 0, data.Length);
-
+            using (var accessor = MapFile.CreateViewAccessor(position * MaxBlockSize, length))
+            {
+                accessor.ReadArray(0, data, 0, data.Length);
+            }
             return Encoding.ASCII.GetString(data);
         }
 
@@ -223,6 +232,7 @@ namespace SquirrelDb
                 if (FreeBlocks.Any(fb => fb.Equals(position))) return;
                 Write(position, Encoding.ASCII.GetString(new byte[MaxBlockSize]));
                 FreeBlocks.Add(position);
+                BlocksFree++;
                 Save();
             }
 

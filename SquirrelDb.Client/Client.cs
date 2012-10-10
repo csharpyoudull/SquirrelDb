@@ -24,6 +24,7 @@ namespace SquirrelDb.Client
 
             var requstJson = JsonConvert.SerializeObject(createBucket);
             var request = HttpWebRequest.Create(hostUrl + "/buckets/") as HttpWebRequest;
+            request.Timeout = 400000;
             request.Method = "PUT";
             request.ContentLength = requstJson.Length;
             request.GetRequestStream().Write(Encoding.ASCII.GetBytes(requstJson), 0, requstJson.Length);
@@ -40,6 +41,7 @@ namespace SquirrelDb.Client
 
             var requstJson = JsonConvert.SerializeObject(documents);
             var request = HttpWebRequest.Create(hostUrl + "/documents/") as HttpWebRequest;
+            request.Timeout = 400000;
             request.Method = "PUT";
             request.ContentLength = requstJson.Length;
             request.GetRequestStream().Write(Encoding.ASCII.GetBytes(requstJson), 0, requstJson.Length);
@@ -56,6 +58,7 @@ namespace SquirrelDb.Client
 
             var requstJson = JsonConvert.SerializeObject(documents);
             var request = HttpWebRequest.Create(hostUrl + "/documents/") as HttpWebRequest;
+            request.Timeout = 400000;
             request.Method = "DELETE";
             request.ContentLength = requstJson.Length;
             request.GetRequestStream().Write(Encoding.ASCII.GetBytes(requstJson), 0, requstJson.Length);
@@ -71,6 +74,7 @@ namespace SquirrelDb.Client
             var hostUrl = ConfigurationManager.AppSettings["ApiHostUrl"];
             
             var request = HttpWebRequest.Create(hostUrl + string.Format("/documents/{0}/{1}",bucket,HttpUtility.UrlEncode(key))) as HttpWebRequest;
+            request.Timeout = 400000;
             var response = request.GetResponse();
             var reader = new StreamReader(response.GetResponseStream());
             var message = reader.ReadToEnd();

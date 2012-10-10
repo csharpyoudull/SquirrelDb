@@ -109,41 +109,66 @@ namespace SquirrelDb
             try
             {
                 var output = new Dictionary<string, string>(requests.Count);
-                Parallel.ForEach(requests, request =>
-                                               {
-                                                   if (string.IsNullOrEmpty(request.BucketName))
-                                                   {
-                                                       output.Add(request.Key, "bucket name required.");
-                                                       return;
-                                                   }
 
-                                                   if (string.IsNullOrEmpty(request.Key))
-                                                   {
-                                                       output.Add(request.Key, "Key required.");
-                                                       return;
-                                                   }
+                //Parallel.ForEach(requests, request =>
+                //                               {
+                //                                   if (string.IsNullOrEmpty(request.BucketName))
+                //                                   {
+                //                                       output.Add(request.Key, "bucket name required.");
+                //                                       return;
+                //                                   }
 
-                                                   if (!Buckets.ContainsKey(request.BucketName.ToLower()))
-                                                   {
-                                                       output.Add(request.Key, "bucket not found");
-                                                       return;
-                                                   }
+                //                                   if (string.IsNullOrEmpty(request.Key))
+                //                                   {
+                //                                       output.Add(request.Key, "Key required.");
+                //                                       return;
+                //                                   }
 
-                                                   if (!request.Update)
-                                                   {
-                                                       Buckets[request.BucketName.ToLower()].Add(request.Key,
-                                                                                                 request.Value);
-                                                       output.Add(request.Key, "ok");
-                                                       return;
-                                                   }
+                //                                   if (!request.Update)
+                //                                   {
+                //                                       Buckets[request.BucketName.ToLower()].Add(request.Key,
+                //                                                                                 request.Value);
+                //                                       output.Add(request.Key, "ok");
+                //                                       return;
+                //                                   }
 
-                                                   if (request.Update)
-                                                   {
-                                                       Buckets[request.BucketName.ToLower()].Update(request.Key,
-                                                                                                    request.Value);
-                                                       output.Add(request.Key, "ok");
-                                                   }
-                                               });
+                //                                   if (request.Update)
+                //                                   {
+                //                                       Buckets[request.BucketName.ToLower()].Update(request.Key,
+                //                                                                                    request.Value);
+                //                                       output.Add(request.Key, "ok");
+                //                                   }
+                //                               });
+
+                foreach (var request in requests)
+                {
+                    if (string.IsNullOrEmpty(request.BucketName))
+                    {
+                        output.Add(request.Key, "bucket name required.");
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(request.Key))
+                    {
+                        output.Add(request.Key, "Key required.");
+                        continue;
+                    }
+
+                    if (!request.Update)
+                    {
+                        Buckets[request.BucketName.ToLower()].Add(request.Key,
+                                                                  request.Value);
+                        output.Add(request.Key, "ok");
+                        continue;
+                    }
+
+                    if (request.Update)
+                    {
+                        Buckets[request.BucketName.ToLower()].Update(request.Key,
+                                                                     request.Value);
+                        output.Add(request.Key, "ok");
+                    }
+                }
 
                 return output;
             }
@@ -170,7 +195,7 @@ namespace SquirrelDb
                 if (string.IsNullOrEmpty(key))
                     return string.Empty;
 
-                return !Buckets.ContainsKey(bucket.ToLower()) ? string.Empty : Buckets[bucket.ToLower()].Get(key);
+                return Buckets[bucket.ToLower()].Get(key);
             }
             catch (Exception ex)
             {
@@ -192,9 +217,6 @@ namespace SquirrelDb
                     return string.Empty;
 
                 if (request.Keys == null || !request.Keys.Any())
-                    return string.Empty;
-
-                if (!Buckets.ContainsKey(request.BucketName.ToLower()))
                     return string.Empty;
 
                 var results = Buckets[request.BucketName.ToLower()].Get(request.Keys);
