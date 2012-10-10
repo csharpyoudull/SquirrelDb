@@ -30,18 +30,6 @@ namespace SquirrelDb
     public class ServerNode:NancyModule
     {
         /// <summary>
-        /// Gets or sets the buckets.
-        /// </summary>
-        /// <value>The buckets.</value>
-        public static Dictionary<string, DataBucket> Buckets { get; set; }
-
-        /// <summary>
-        /// Gets or sets the db location.
-        /// </summary>
-        /// <value>The db location.</value>
-        public static string DbLocation { get; set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ServerNode" /> class.
         /// </summary>
         public ServerNode()
@@ -75,27 +63,22 @@ namespace SquirrelDb
                                             var reader = new StreamReader(Request.Body);
                                             var json = reader.ReadToEnd();
 
-                                            return DeleteRecord(JsonConvert.DeserializeObject<List<DeleteRequest>>(json));
+                                            return DeleteRecord(JsonConvert.DeserializeObject<DeleteRequest>(json));
                                         };
 
 
         }
 
-        private string DeleteRecord(List<DeleteRequest> deletes)
+        private HttpStatusCode DeleteRecord(DeleteRequest delete)
         {
             try
-            {
-                foreach (var delete in deletes)
-                {
-                    if (Buckets.ContainsKey(delete.BucketName))
-                        Buckets[delete.BucketName].Delete(delete.Key);
-                }
-
-                return "ok";
+            {                
+                Buckets[delete.BucketName].Delete(delete.Key);
+                return HttpStatusCode.OK;
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return HttpStatusCode.InternalServerError;
             }
         }
 
@@ -199,25 +182,27 @@ namespace SquirrelDb
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>System.String.</returns>
-        public string CreateBucket(CreateBucketRequest request)
+        public HttpStatusCode CreateBucket(CreateBucketRequest request)
         {
             try
             {
                 request.BucketName = request.BucketName.ToLower();
                 if (string.IsNullOrEmpty(request.BucketName))
-                    return string.Empty;
+                    return HttpStatusCode.BadRequest;
 
                 if (Buckets.ContainsKey(request.BucketName))
-                    return string.Empty;
+                    return HttpStatusCode.BadRequest;
 
                 Buckets.Add(request.BucketName,DataBucket.CreateNewBucket(request.BucketName,DbLocation,request.MaxRecordSize,request.MaxRecordsPerBin));
-                return "ok";
+                return HttpStatusCode.OK;
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return HttpStatusCode.InternalServerError;
             }
         }
+
+        #region static methods and properties
 
         /// <summary>
         /// Gets or sets the service host.
@@ -243,5 +228,19 @@ namespace SquirrelDb
             ServiceHost = new NancyHost(new Uri(hostUrl));
             ServiceHost.Start();
         }
+
+        /// <summary>
+        /// Gets or sets the buckets.
+        /// </summary>
+        /// <value>The buckets.</value>
+        public static Dictionary<string, DataBucket> Buckets { get; set; }
+
+        /// <summary>
+        /// Gets or sets the db location.
+        /// </summary>
+        /// <value>The db location.</value>
+        public static string DbLocation { get; set; }
+
+        #endregion
     }
 }

@@ -15,7 +15,7 @@ namespace SquirrelDb.Client
 {
     public class Client
     {
-        public bool CreateBucket(string name, int maxRecordSize, int maxRecordsPerBin)
+        public HttpStatusCode CreateBucket(string name, int maxRecordSize, int maxRecordsPerBin)
         {
             var hostUrl = ConfigurationManager.AppSettings["ApiHostUrl"];
 
@@ -28,11 +28,8 @@ namespace SquirrelDb.Client
             request.Method = "PUT";
             request.ContentLength = requstJson.Length;
             request.GetRequestStream().Write(Encoding.ASCII.GetBytes(requstJson), 0, requstJson.Length);
-            var response = request.GetResponse();
-            var reader = new StreamReader(response.GetResponseStream());
-            var message = reader.ReadToEnd();
-
-            return message.Equals("ok", StringComparison.OrdinalIgnoreCase);
+            var response = request.GetResponse() as HttpWebResponse;
+            return response.StatusCode;
         }
 
         public HttpStatusCode StoreDocument(WriteDocRequest documents)
@@ -50,21 +47,19 @@ namespace SquirrelDb.Client
             return response.StatusCode;
         }
 
-        public string DeleteDocument(List<DeleteRequest> documents)
+        public HttpStatusCode DeleteDocument(DeleteRequest document)
         {
             var hostUrl = ConfigurationManager.AppSettings["ApiHostUrl"];
 
-            var requstJson = JsonConvert.SerializeObject(documents);
+            var requstJson = JsonConvert.SerializeObject(document);
             var request = HttpWebRequest.Create(hostUrl + "/documents/") as HttpWebRequest;
             request.Timeout = 400000;
             request.Method = "DELETE";
             request.ContentLength = requstJson.Length;
             request.GetRequestStream().Write(Encoding.ASCII.GetBytes(requstJson), 0, requstJson.Length);
-            var response = request.GetResponse();
-            var reader = new StreamReader(response.GetResponseStream());
-            var message = reader.ReadToEnd();
+            var response = request.GetResponse() as HttpWebResponse;
 
-            return message;
+            return response.StatusCode;
         }
 
         public string GetDocument(string bucket, string key)

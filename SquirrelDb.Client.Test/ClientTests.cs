@@ -15,7 +15,7 @@ namespace SquirrelDb.Client.Test
             var client = new Client();
             var result = client.CreateBucket("TestBucket", 1024, 250000);
 
-            Assert.IsTrue(result);
+            Assert.IsTrue(result == HttpStatusCode.OK);
         }
 
         [TestMethod]

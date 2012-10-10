@@ -135,7 +135,7 @@ namespace SquirrelDb.Client.Console
             var result = client.CreateBucket(kv[0],int.Parse(kv[1]),int.Parse(kv[2]));
             watch.Stop();
 
-            System.Console.WriteLine("Create bucket {0} operation took {1} milliseconds", result ? "successful" : "failed", watch.ElapsedMilliseconds);
+            System.Console.WriteLine("Create bucket {0} operation took {1} milliseconds", result == HttpStatusCode.OK ? "successful" : "failed", watch.ElapsedMilliseconds);
         }
 
         static void Add(string commandLine)
@@ -163,10 +163,10 @@ namespace SquirrelDb.Client.Console
             var kv = commandLine.Split('|');
             var client = new Client();
             var watch = Stopwatch.StartNew();
-            var result = client.DeleteDocument(new List<DeleteRequest> { new DeleteRequest { BucketName = kv[0], Key = kv[1] } });
+            var result = client.DeleteDocument( new DeleteRequest { BucketName = kv[0], Key = kv[1] });
             watch.Stop();
 
-            System.Console.WriteLine("Write {0} operation took {1} milliseconds", result.Equals("ok") ? "successful" : "failed", watch.ElapsedMilliseconds);
+            System.Console.WriteLine("Write {0} operation took {1} milliseconds", result == HttpStatusCode.OK ? "successful" : "failed", watch.ElapsedMilliseconds);
         }
 
 
