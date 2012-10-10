@@ -13,6 +13,7 @@
 // ***********************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
@@ -53,13 +54,6 @@ namespace SquirrelDb
         #endregion
 
         #region constructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="KeyTree" /> class.
-        /// </summary>
-        public KeyTree()
-        {
-        }
 
         /// <summary>
         /// Creates the new.
@@ -109,24 +103,44 @@ namespace SquirrelDb
                 return;
             }
 
-            var freeNode = SeekFreeNode(Root, value);
+            var freeNode = SeekFreeNode(value);
 
             if (freeNode.Value.Equals(value) && !freeNode.Pointer.Equals(pointer))
             {
-                freeNode.Pointer = pointer;
-                return;
+                throw new DuplicateKeyException();
             }
 
             if (value < freeNode.Value)
             {
                 Count++;
                 freeNode.Left = new KeyNode { Parent = freeNode, Pointer = pointer, Value = value };
+                Save();
                 return;
             }
 
             Count++;
             freeNode.Right = new KeyNode { Parent = freeNode, Pointer = pointer, Value = value };
+            Save();
+        }
 
+        /// <summary>
+        /// Updates the specified value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="newDocumentSize">New size of the document.</param>
+        /// <exception cref="System.Collections.Generic.KeyNotFoundException"></exception>
+        public KeyNode Update(long value, int newDocumentSize)
+        {
+            var existing = SeekNode(Root,value);
+
+            if (existing != null)
+            {
+                existing.Pointer.UpdateSize(newDocumentSize);
+                Save();
+                return existing;
+            }
+
+            throw new KeyNotFoundException();
         }
 
         /// <summary>
@@ -146,14 +160,21 @@ namespace SquirrelDb
             if (node.Value.Equals(value))
                 return node;
 
-            if (node.Left != null && value < node.Value)
-                return SeekNode(node.Left, value);
+            var seek = node;
+            
+            while (seek != null)
+            {
+                if (seek.Value.Equals(value))
+                    return seek;
 
-            if (node.Right != null && value > node.Value)
-                return SeekNode(node.Right, value);
+                if (seek.Left != null && value < seek.Value)
+                    seek = seek.Left;
+
+                if (seek.Right != null && value > seek.Value)
+                    seek = seek.Right;
+            }
 
             return null;
-
         }
 
         /// <summary>
@@ -221,7 +242,7 @@ namespace SquirrelDb
                     node.Parent.Right = node.Right;
                     if (node.Left != null)
                     {
-                        var newParent = SeekFreeNode(node.Right, node.Left.Value);
+                        var newParent = SeekFreeNode(node.Left.Value,node.Right);
                         if (node.Left.Value < newParent.Value)
                         {
                             newParent.Left = node.Left;
@@ -277,25 +298,35 @@ namespace SquirrelDb
         /// <summary>
         /// Seeks the free node.
         /// </summary>
-        /// <param name="node">The node.</param>
         /// <param name="value">The value.</param>
+        /// <param name="from">From.</param>
         /// <returns>KeyNode.</returns>
-        private KeyNode SeekFreeNode(KeyNode node, long value)
+        private KeyNode SeekFreeNode(long value, KeyNode from = null)
         {
+            var node = from ?? Root;
+
             if (node.Value.Equals(value))
                 return node;
 
-            if (node.Left == null && value < node.Value)
-                return node;
+            var seek = node;
 
-            if (node.Right == null && value > node.Value)
-                return node;
+            while (seek != null)
+            {
+                if (seek.Value.Equals(value))
+                    return seek;
 
-            if (node.Left != null && value < node.Value)
-                return SeekFreeNode(node.Left, value);
+                if (seek.Left == null && value < seek.Value)
+                    return seek;
 
-            if (node.Right != null && value > node.Value)
-                return SeekFreeNode(node.Right, value);
+                if (seek.Right == null && value > seek.Value)
+                    return seek;
+
+                if (seek.Left != null && value < seek.Value)
+                    seek = seek.Left;
+
+                if (seek.Right != null && value > seek.Value)
+                    seek = seek.Right;
+            }
 
             return null;
         }

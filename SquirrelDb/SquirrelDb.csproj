@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="DataBucket.cs" />
     <Compile Include="DataPointer.cs" />
+    <Compile Include="DuplicateKeyException.cs" />
     <Compile Include="Requests\CreateBucketRequest.cs" />
     <Compile Include="Requests\DeleteRequest.cs" />
     <Compile Include="Requests\GetMultipleRequest.cs" />

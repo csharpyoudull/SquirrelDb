@@ -153,9 +153,6 @@ namespace SquirrelDb
         {
             //get a map with a free space
             var keyHash = key.GetHashCode();
-            if (KeyTree.SeekNode(null,keyHash) != null)
-                throw new Exception("Document with this key already exists.");
-
             var freeMap = MappedFiles.FirstOrDefault(mf => mf.Value.FreeBlocks.Any());
             while (freeMap.Value == null)
             {
@@ -177,15 +174,8 @@ namespace SquirrelDb
         public void Update(string key, string document)
         {
             var keyHash = key.GetHashCode();
-            var keyData = KeyTree.SeekNode(null, keyHash);
-
-            if (keyData == null)
-                throw new Exception("Document not found.");
-
-            keyData.Pointer.UpdateSize(document.Length);
-            MappedFiles[keyData.Pointer.FileId].Write(keyData.Pointer.Pointer, document);
-            KeyTree.Save();
-            
+            var keyData = KeyTree.Update(keyHash, document.Length);
+            MappedFiles[keyData.Pointer.FileId].Write(keyData.Pointer.Pointer, document);  
         }
 
         /// <summary>
