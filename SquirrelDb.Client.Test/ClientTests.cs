@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SquirrelDb.Client.Requests;
 
@@ -21,9 +22,9 @@ namespace SquirrelDb.Client.Test
         public void WriteEntryTest()
         {
             var client = new Client();
-            var result =client.StoreDocument(new List<WriteDocRequest>{new WriteDocRequest(){BucketName ="TestBucket", Key ="TestKey", Value="This is some sample text for a test."}});
-        
-            Assert.IsTrue(result["TestKey"].Equals("ok"));
+            var result =client.StoreDocument(new  WriteDocRequest(){BucketName ="TestBucket", Key ="TestKey", Value="This is some sample text for a test."});
+
+            Assert.IsTrue(result == HttpStatusCode.OK);
         }
 
         [TestMethod]

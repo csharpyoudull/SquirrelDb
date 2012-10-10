@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using SquirrelDb.Client.Requests;
@@ -69,7 +70,8 @@ namespace SquirrelDb.Client.Console
             var input = File.ReadAllLines(commandLine).Select(ln => ln.Split('|'));
             var request = input.Select(i => new WriteDocRequest {BucketName = i[0], Key = i[1], Value = i[2]}).ToList();
             var watch = Stopwatch.StartNew();
-            client.StoreDocument(request);
+            foreach (var r in request)
+                client.StoreDocument(r);
             watch.Stop();
 
             System.Console.WriteLine("{0} records inserted.",input.Count());
@@ -113,13 +115,14 @@ namespace SquirrelDb.Client.Console
             var to = int.Parse(kv[3]);
             var request = new List<WriteDocRequest>(to);
             
-            for (var i = from; i < to; i ++)
-                request.Add(new WriteDocRequest { BucketName = bucket, Key = keyHead + i, Value = i.ToString() });
-                                    
             var watch = Stopwatch.StartNew();
-            client.StoreDocument(request);
+            Parallel.For(from, to, i =>
+                                       {
+                                           client.StoreDocument(new WriteDocRequest { BucketName = bucket, Key = keyHead + i, Value = i.ToString() });                
+                                       });
+                                
             watch.Stop();
-            System.Console.WriteLine("{0} records inserted.", to);
+            System.Console.WriteLine("{0} records inserted.", to - from);
             System.Console.WriteLine("Operation took {0} milliseconds", watch.ElapsedMilliseconds);
         }
 
@@ -141,16 +144,16 @@ namespace SquirrelDb.Client.Console
             var kv = commandLine.Split('|');
             var client = new Client();
             var watch = Stopwatch.StartNew();
-            var result = client.StoreDocument(new List<WriteDocRequest>{new WriteDocRequest{BucketName =kv[0],Key = kv[1], Value =kv[2]}});
+            var result = client.StoreDocument(new WriteDocRequest{BucketName =kv[0],Key = kv[1], Value =kv[2]});
             watch.Stop();
 
-            System.Console.WriteLine("Write {0} operation took {1} milliseconds",result[kv[1]].Equals("ok") ? "successful" : "failed",watch.ElapsedMilliseconds);
+            System.Console.WriteLine("Write {0} operation took {1} milliseconds",result == HttpStatusCode.OK ? "successful" : "failed",watch.ElapsedMilliseconds);
         }
 
         static void Add(string bucket, string key, string value)
         {
             var client = new Client();
-            var result = client.StoreDocument(new List<WriteDocRequest> { new WriteDocRequest { BucketName = bucket, Key = key, Value = value } });
+            var result = client.StoreDocument(new WriteDocRequest { BucketName = bucket, Key = key, Value = value });
         }
 
 

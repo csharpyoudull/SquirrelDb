@@ -35,7 +35,7 @@ namespace SquirrelDb.Client
             return message.Equals("ok", StringComparison.OrdinalIgnoreCase);
         }
 
-        public Dictionary<string,string> StoreDocument(List<WriteDocRequest> documents)
+        public HttpStatusCode StoreDocument(WriteDocRequest documents)
         {
             var hostUrl = ConfigurationManager.AppSettings["ApiHostUrl"];
 
@@ -45,11 +45,9 @@ namespace SquirrelDb.Client
             request.Method = "PUT";
             request.ContentLength = requstJson.Length;
             request.GetRequestStream().Write(Encoding.ASCII.GetBytes(requstJson), 0, requstJson.Length);
-            var response = request.GetResponse();
-            var reader = new StreamReader(response.GetResponseStream());
-            var message = reader.ReadToEnd();
+            var response = request.GetResponse() as HttpWebResponse;
 
-            return JsonConvert.DeserializeObject<Dictionary<string, string>>(message);
+            return response.StatusCode;
         }
 
         public string DeleteDocument(List<DeleteRequest> documents)

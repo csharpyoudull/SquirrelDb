@@ -60,7 +60,7 @@ namespace SquirrelDb
                                         var reader = new StreamReader(Request.Body);
                                         var json = reader.ReadToEnd();
 
-                                        return Store(JsonConvert.DeserializeObject<List<WriteDocRequest>>(json));
+                                        return Store(JsonConvert.DeserializeObject<WriteDocRequest>(json));
                                     };
 
             Put["/buckets/"] = parameters =>
@@ -104,78 +104,43 @@ namespace SquirrelDb
         /// </summary>
         /// <param name="requests">The requests.</param>
         /// <returns>System.String.</returns>
-        private Dictionary<string,string> Store(List<WriteDocRequest> requests)
+        private HttpStatusCode Store(WriteDocRequest request)
         {
             try
             {
-                var output = new Dictionary<string, string>(requests.Count);
-
-                //Parallel.ForEach(requests, request =>
-                //                               {
-                //                                   if (string.IsNullOrEmpty(request.BucketName))
-                //                                   {
-                //                                       output.Add(request.Key, "bucket name required.");
-                //                                       return;
-                //                                   }
-
-                //                                   if (string.IsNullOrEmpty(request.Key))
-                //                                   {
-                //                                       output.Add(request.Key, "Key required.");
-                //                                       return;
-                //                                   }
-
-                //                                   if (!request.Update)
-                //                                   {
-                //                                       Buckets[request.BucketName.ToLower()].Add(request.Key,
-                //                                                                                 request.Value);
-                //                                       output.Add(request.Key, "ok");
-                //                                       return;
-                //                                   }
-
-                //                                   if (request.Update)
-                //                                   {
-                //                                       Buckets[request.BucketName.ToLower()].Update(request.Key,
-                //                                                                                    request.Value);
-                //                                       output.Add(request.Key, "ok");
-                //                                   }
-                //                               });
-
-                foreach (var request in requests)
+                
+                if (string.IsNullOrEmpty(request.BucketName))
                 {
-                    if (string.IsNullOrEmpty(request.BucketName))
-                    {
-                        output.Add(request.Key, "bucket name required.");
-                        continue;
-                    }
-
-                    if (string.IsNullOrEmpty(request.Key))
-                    {
-                        output.Add(request.Key, "Key required.");
-                        continue;
-                    }
-
-                    if (!request.Update)
-                    {
-                        Buckets[request.BucketName.ToLower()].Add(request.Key,
-                                                                  request.Value);
-                        output.Add(request.Key, "ok");
-                        continue;
-                    }
-
-                    if (request.Update)
-                    {
-                        Buckets[request.BucketName.ToLower()].Update(request.Key,
-                                                                     request.Value);
-                        output.Add(request.Key, "ok");
-                    }
+                    return HttpStatusCode.BadRequest;
                 }
 
-                return output;
+                if (string.IsNullOrEmpty(request.Key))
+                {
+                    return HttpStatusCode.BadRequest;
+                }
+
+                if (!request.Update)
+                {
+                    Buckets[request.BucketName.ToLower()].Add(request.Key,
+                                                                request.Value);
+
+                    return HttpStatusCode.OK;
+                }
+
+                if (request.Update)
+                {
+                    Buckets[request.BucketName.ToLower()].Update(request.Key,
+                                                                    request.Value);
+
+                    return HttpStatusCode.OK;
+                }
+
+                return HttpStatusCode.BadRequest;
             }
             catch(Exception ex)
             {
-                return new Dictionary<string, string>{{"all",ex.Message}};
-                
+                return HttpStatusCode.InternalServerError;
+
             }
         }
 

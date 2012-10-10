@@ -154,11 +154,11 @@ namespace SquirrelDb
         {
             //get a map with a free space
             var keyHash = key.GetHashCode();
-            var freeMap = MappedFiles.FirstOrDefault(mf => mf.Value.FreeBlocks.Any());
+            var freeMap = MappedFiles.FirstOrDefault(mf => mf.Value.BlocksFree > 0);
             if (freeMap.Value == null)
             {
                 CreateNewMapFile();
-                freeMap = MappedFiles.FirstOrDefault(mf => mf.Value.FreeBlocks.Any());
+                freeMap = MappedFiles.FirstOrDefault(mf => mf.Value.BlocksFree > 0);
             }
             
             var index = freeMap.Value.Write(document);
