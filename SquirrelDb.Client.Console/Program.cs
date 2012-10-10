@@ -55,7 +55,9 @@ namespace SquirrelDb.Client.Console
                 if (option.StartsWith("bulk add", StringComparison.OrdinalIgnoreCase))
                     BulkAdd(option);
 
-                
+                if (option.StartsWith("bulk get", StringComparison.OrdinalIgnoreCase))
+                    BulkGet(option);
+
             }
         }
 
@@ -74,6 +76,31 @@ namespace SquirrelDb.Client.Console
             System.Console.WriteLine("Operation took {0} milliseconds", watch.ElapsedMilliseconds);
         }
 
+        static void BulkGet(string commandLine)
+        {
+            commandLine = commandLine.Remove(0, 9);
+            var client = new Client();
+
+            var kv = commandLine.Split('|');
+            var bucket = kv[0];
+            var keyHead = kv[1];
+            var from = int.Parse(kv[2]);
+            var to = int.Parse(kv[3]);
+
+            var keys = new List<string>();
+            for (var i = from; i < to; i ++)
+                keys.Add(keyHead + i);
+
+            var reuqest = new GetMultipleRequest {BucketName = bucket, Keys = keys};
+
+            var watch = Stopwatch.StartNew(); 
+            var result = client.GetDocuemnts(reuqest);
+            watch.Stop();
+            System.Console.WriteLine("{0} results returned.", result.Count);
+            System.Console.WriteLine("{0} documents found, {1} documents not found", result.Count(data => !string.IsNullOrEmpty(data.Value)), result.Count(data => string.IsNullOrEmpty(data.Value)));
+            System.Console.WriteLine("Operation took {0} milliseconds", watch.ElapsedMilliseconds);
+        }
+
         static void BulkAdd(string commandLine)
         {
             commandLine = commandLine.Remove(0, 9);
@@ -82,13 +109,13 @@ namespace SquirrelDb.Client.Console
             var kv = commandLine.Split('|');
             var bucket = kv[0];
             var keyHead = kv[1];
-            var to = int.Parse(kv[2]);
+            var from = int.Parse(kv[2]);
+            var to = int.Parse(kv[3]);
             var request = new List<WriteDocRequest>(to);
-            Parallel.For(0, to, i =>
-                                    {
-                                        request.Add(new WriteDocRequest{BucketName = bucket,Key = keyHead + i, Value = i.ToString()});
-                                    });
-
+            
+            for (var i = from; i < to; i ++)
+                request.Add(new WriteDocRequest { BucketName = bucket, Key = keyHead + i, Value = i.ToString() });
+                                    
             var watch = Stopwatch.StartNew();
             client.StoreDocument(request);
             watch.Stop();
@@ -162,7 +189,9 @@ namespace SquirrelDb.Client.Console
             var request = new GetMultipleRequest { BucketName = kv[0][0], Keys = lines.ToList() };
             var result = client.GetDocuemnts(request);
             watch.Stop();
-            
+
+            result = result ?? new Dictionary<string, string>();
+
             foreach (var item in result)
                 System.Console.WriteLine(item.Key + ":   " + item.Value);
 
@@ -177,7 +206,8 @@ namespace SquirrelDb.Client.Console
             System.Console.WriteLine("Options");
             System.Console.WriteLine("--------------------------");
             System.Console.WriteLine("Add: add bucket|key|value");
-            System.Console.WriteLine("Bulk Add: bulk add bucket|key start|count");
+            System.Console.WriteLine("Bulk Add: bulk add bucket|key start|from|to");
+            System.Console.WriteLine("Bulk Get: bulk get bucket|key start|from|to");
             System.Console.WriteLine("Get: get bucket|key");
             System.Console.WriteLine("Del: del bucket|key");
             System.Console.WriteLine("CBucket: bucketName|maxRecordSize|maxRecordsPerBin");           

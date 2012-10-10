@@ -102,34 +102,39 @@ namespace SquirrelDb
         /// <summary>
         /// Stores the specified request.
         /// </summary>
-        /// <param name="request">The request.</param>
+        /// <param name="requests">The requests.</param>
         /// <returns>System.String.</returns>
         private Dictionary<string,string> Store(List<WriteDocRequest> requests)
         {
             try
             {
-                var output = new Dictionary<string, string>();
+                var output = new Dictionary<string, string>(requests.Count);
                 Parallel.ForEach(requests, request =>
                                                {
                                                    if (string.IsNullOrEmpty(request.BucketName))
                                                    {
-                                                       output.Add(request.Key,"bucket name required.");
+                                                       output.Add(request.Key, "bucket name required.");
+                                                       return;
                                                    }
 
                                                    if (string.IsNullOrEmpty(request.Key))
                                                    {
-                                                       output.Add(request.Key, "bucket name required.");
+                                                       output.Add(request.Key, "Key required.");
+                                                       return;
                                                    }
 
                                                    if (!Buckets.ContainsKey(request.BucketName.ToLower()))
                                                    {
-                                                       output.Add(request.Key, "bucket name required.");
+                                                       output.Add(request.Key, "bucket not found");
+                                                       return;
                                                    }
+
                                                    if (!request.Update)
                                                    {
                                                        Buckets[request.BucketName.ToLower()].Add(request.Key,
                                                                                                  request.Value);
                                                        output.Add(request.Key, "ok");
+                                                       return;
                                                    }
 
                                                    if (request.Update)
@@ -139,6 +144,7 @@ namespace SquirrelDb
                                                        output.Add(request.Key, "ok");
                                                    }
                                                });
+
                 return output;
             }
             catch(Exception ex)

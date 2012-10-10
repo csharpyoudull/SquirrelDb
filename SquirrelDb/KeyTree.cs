@@ -35,10 +35,6 @@ namespace SquirrelDb
         /// <value>The count.</value>
         public long Count { get; set; }
 
-        #endregion
-
-        #region private properties
-
         /// <summary>
         /// Gets or sets the name of the file.
         /// </summary>
@@ -50,6 +46,8 @@ namespace SquirrelDb
         /// </summary>
         /// <value>The root.</value>
         public KeyNode Root { get; set; }
+
+        private readonly object _treeLock = new object();
 
         #endregion
 
@@ -99,13 +97,13 @@ namespace SquirrelDb
             if (Root == null)
             {
                 Count++;
-                Root = new KeyNode { Value = value, Pointer = pointer };
+                Root = new KeyNode {Value = value, Pointer = pointer};
                 return;
             }
 
             var freeNode = SeekFreeNode(value);
 
-            if (freeNode.Value.Equals(value) && !freeNode.Pointer.Equals(pointer))
+            if (freeNode.Value.Equals(value))
             {
                 throw new DuplicateKeyException();
             }
@@ -113,14 +111,15 @@ namespace SquirrelDb
             if (value < freeNode.Value)
             {
                 Count++;
-                freeNode.Left = new KeyNode { Parent = freeNode, Pointer = pointer, Value = value };
+                freeNode.Left = new KeyNode {Parent = freeNode, Pointer = pointer, Value = value};
                 Save();
                 return;
             }
 
             Count++;
-            freeNode.Right = new KeyNode { Parent = freeNode, Pointer = pointer, Value = value };
+            freeNode.Right = new KeyNode {Parent = freeNode, Pointer = pointer, Value = value};
             Save();
+
         }
 
         /// <summary>
@@ -167,10 +166,13 @@ namespace SquirrelDb
                 if (seek.Value.Equals(value))
                     return seek;
 
-                if (seek.Left != null && value < seek.Value)
+                if (value < seek.Value)
+                {
                     seek = seek.Left;
+                    continue;
+                }
 
-                if (seek.Right != null && value > seek.Value)
+                if (value > seek.Value)
                     seek = seek.Right;
             }
 
@@ -182,7 +184,7 @@ namespace SquirrelDb
         /// </summary>
         /// <param name="value">The value.</param>
         public void Delete(long value)
-        {
+        {  
             var node = SeekNode(null, value);
 
             if (node == null)
@@ -242,7 +244,7 @@ namespace SquirrelDb
                     node.Parent.Right = node.Right;
                     if (node.Left != null)
                     {
-                        var newParent = SeekFreeNode(node.Left.Value,node.Right);
+                        var newParent = SeekFreeNode(node.Left.Value, node.Right);
                         if (node.Left.Value < newParent.Value)
                         {
                             newParent.Left = node.Left;
@@ -268,6 +270,7 @@ namespace SquirrelDb
             {
                 node.Parent.Right = node.Left;
             }
+            
         }
 
         /// <summary>
@@ -321,10 +324,13 @@ namespace SquirrelDb
                 if (seek.Right == null && value > seek.Value)
                     return seek;
 
-                if (seek.Left != null && value < seek.Value)
+                if (value < seek.Value)
+                {
                     seek = seek.Left;
+                    continue;
+                }
 
-                if (seek.Right != null && value > seek.Value)
+                if (value > seek.Value)
                     seek = seek.Right;
             }
 

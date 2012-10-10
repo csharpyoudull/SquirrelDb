@@ -161,6 +161,13 @@ namespace SquirrelDb
             }
 
             var index = freeMap.Value.Write(document);
+
+            if (index < 0)
+            {
+                Add(key,document);
+                return;
+            }
+
             KeyTree.Insert(keyHash,new DataPointer{FileId = freeMap.Key,Pointer = index,Size = document.Length});
             KeyTree.Save();
         }
