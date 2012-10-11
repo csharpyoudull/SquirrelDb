@@ -34,6 +34,8 @@ namespace SquirrelDb
         /// </summary>
         public ServerNode()
         {
+            #region crud http methods
+
             Get["/documents/{bucket}/{id}"] = parameters => GetByKey(parameters["bucket"],parameters["id"]);
             Get["/buckets/"] = parameters => JsonConvert.SerializeObject(Buckets.Keys);
             Post["/documents/"] = parameters =>
@@ -66,9 +68,24 @@ namespace SquirrelDb
                                             return DeleteRecord(JsonConvert.DeserializeObject<DeleteRequest>(json));
                                         };
 
+            #endregion
 
+            #region server node http methods
+            
+            #endregion
         }
 
+        
+        #region server methods
+        #endregion
+
+        #region crud
+
+        /// <summary>
+        /// Deletes the record.
+        /// </summary>
+        /// <param name="delete">The delete.</param>
+        /// <returns>HttpStatusCode.</returns>
         private HttpStatusCode DeleteRecord(DeleteRequest delete)
         {
             try
@@ -119,6 +136,14 @@ namespace SquirrelDb
                 }
 
                 return HttpStatusCode.BadRequest;
+            }
+            catch(DuplicateKeyException keyError)
+            {
+                return HttpStatusCode.Forbidden;
+            }
+            catch(KeyNotFoundException keyError)
+            {
+                return HttpStatusCode.NotFound;
             }
             catch(Exception ex)
             {
@@ -182,7 +207,7 @@ namespace SquirrelDb
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>System.String.</returns>
-        public HttpStatusCode CreateBucket(CreateBucketRequest request)
+        private HttpStatusCode CreateBucket(CreateBucketRequest request)
         {
             try
             {
@@ -201,6 +226,8 @@ namespace SquirrelDb
                 return HttpStatusCode.InternalServerError;
             }
         }
+
+        #endregion
 
         #region static methods and properties
 

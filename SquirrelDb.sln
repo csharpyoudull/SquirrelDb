@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquirrelDb.MocServer", "Squ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquirrelDb.Client.Console", "SquirrelDb.Client.Console\SquirrelDb.Client.Console.csproj", "{22C71B04-3AA8-4031-B3A1-5607426C2BDF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquirrelDb.Interfaces", "SquirrelDb.Interfaces\SquirrelDb.Interfaces.csproj", "{FF2DDBCD-AC47-43C0-8753-DEE217452C57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{22C71B04-3AA8-4031-B3A1-5607426C2BDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22C71B04-3AA8-4031-B3A1-5607426C2BDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22C71B04-3AA8-4031-B3A1-5607426C2BDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF2DDBCD-AC47-43C0-8753-DEE217452C57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF2DDBCD-AC47-43C0-8753-DEE217452C57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF2DDBCD-AC47-43C0-8753-DEE217452C57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF2DDBCD-AC47-43C0-8753-DEE217452C57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

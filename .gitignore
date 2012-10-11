@@ -7,3 +7,6 @@ TestResults
 /Db
 *.sst
 *.bin
+*.user
+*.suo
+_ReSharper.*

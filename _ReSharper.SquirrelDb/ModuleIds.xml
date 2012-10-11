@@ -7,4 +7,5 @@
   <Module PersistentId="00C7469D-6AC7-4E1E-A6DF-130F24EDE98C" ModuleId="SquirrelDb.Client.Test" />
   <Module PersistentId="67498487-5386-44F8-9ACE-2A5790B2E999" ModuleId="SquirrelDb.MocServer" />
   <Module PersistentId="22C71B04-3AA8-4031-B3A1-5607426C2BDF" ModuleId="SquirrelDb.Client.Console" />
+  <Module PersistentId="FF2DDBCD-AC47-43C0-8753-DEE217452C57" ModuleId="SquirrelDb.Interfaces" />
 </Modules>

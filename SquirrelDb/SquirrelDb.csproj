@@ -63,6 +63,10 @@
     <Compile Include="ServerNode.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SquirrelDb.Interfaces\SquirrelDb.Interfaces.csproj">
+      <Project>{ff2ddbcd-ac47-43c0-8753-dee217452c57}</Project>
+      <Name>SquirrelDb.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SquirrelDb.Utility\SquirrelDb.Utility.csproj">
       <Project>{b05d04ba-5adb-4a42-af08-b5a94ebec9a0}</Project>
       <Name>SquirrelDb.Utility</Name>
