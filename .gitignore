@@ -10,4 +10,4 @@ TestResults
 *.user
 *.suo
 _ReSharper.*
-.nuget
+packages
